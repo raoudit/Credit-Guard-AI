@@ -70,7 +70,7 @@ html, body, .stApp { background: #05070f !important; color: #e0e8f0; font-family
 """, unsafe_allow_html=True)
 
 
-# ─── MODEL (cached so it trains only once) ────────────────────────────────────
+#  MODEL (cached so it trains only once)
 @st.cache_resource(show_spinner="🤖 Training fraud detection model...")
 def get_model():
     np.random.seed(42)
@@ -122,7 +122,7 @@ def predict_transactions(df):
     return pred, score
 
 
-# ─── DEMO DATA GENERATORS ─────────────────────────────────────────────────────
+#  DEMO DATA GENERATORS 
 def make_demo(seed, n_legit, n_fraud, label):
     np.random.seed(seed)
     rows = []
@@ -146,7 +146,7 @@ DEMOS = {
 }
 
 
-# ─── HERO ─────────────────────────────────────────────────────────────────────
+# HERO 
 st.markdown("""
 <div class="hero-wrap">
   <div class="hero-badge">🛡️ AI-Powered Protection</div>
@@ -155,7 +155,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─── ROTATING GLOBE (injected via st.markdown with Three.js) ─────────────────
+#  ROTATING GLOBE ( 
 st.markdown("""
 <canvas id="cg-globe"></canvas>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -259,7 +259,7 @@ st.markdown("""
 
 
 
-# ─── UPLOAD + DEMO BUTTONS ────────────────────────────────────────────────────
+# UPLOAD + DEMO BUTTONS
 col_up, col_btns = st.columns([2, 2])
 
 with col_up:
@@ -285,7 +285,7 @@ with col_btns:
             st.session_state['use_demo'] = True
             st.rerun()
 
-# ─── LOAD DATA ────────────────────────────────────────────────────────────────
+#  LOAD DATA
 df_raw = None
 demo_label = ""
 
@@ -296,7 +296,7 @@ elif st.session_state.get('use_demo') and st.session_state.get('demo_key'):
     key = st.session_state['demo_key']
     df_raw, demo_label = DEMOS[key][0], DEMOS[key][1]
 
-# ─── LANDING PAGE ─────────────────────────────────────────────────────────────
+# LANDING PAGE
 if df_raw is None:
     st.markdown('<div class="section-hdr">How it works</div>', unsafe_allow_html=True)
     c1,c2,c3 = st.columns(3)
@@ -312,7 +312,7 @@ if df_raw is None:
                 <div style="color:#5577aa;font-size:0.85em;line-height:1.5">{desc}</div>
             </div>""", unsafe_allow_html=True)
 
-    # show model performance even before any data
+   
     _, _, _, perf = get_model()
     st.markdown('<div class="section-hdr">Model Performance (on training test split)</div>', unsafe_allow_html=True)
     p1,p2,p3,p4 = st.columns(4)
@@ -332,7 +332,7 @@ if df_raw is None:
     st.stop()
 
 
-# ─── RUN DETECTION ────────────────────────────────────────────────────────────
+#  RUN DETECTION 
 with st.spinner("🔍 Scanning transactions for fraud..."):
     fraud_pred, fraud_score = predict_transactions(df_raw)
 
@@ -347,17 +347,17 @@ fraud_rate = n_fraud / n_total * 100
 amt_col    = next((c for c in df_raw.columns if 'amount' in c.lower()), None)
 amt_risk   = df_res[df_res['_pred']==1][amt_col].sum() if amt_col else 0
 
-# ─── RESET BUTTON ─────────────────────────────────────────────────────────────
+#  RESET BUTTON
 if st.button("🔄 Reset / Try Another Dataset"):
     st.session_state['use_demo'] = False
     st.session_state['demo_key'] = None
     st.rerun()
 
-# ─── DEMO LABEL ───────────────────────────────────────────────────────────────
+#  DEMO LABEL
 if demo_label:
     st.info(f"📂 Demo dataset loaded: **{st.session_state.get('demo_key','')}** — {demo_label}")
 
-# ─── SUMMARY STATS ────────────────────────────────────────────────────────────
+#  SUMMARY STATS 
 st.markdown('<div class="section-hdr">Protection Summary</div>', unsafe_allow_html=True)
 c1,c2,c3,c4 = st.columns(4)
 for col,label,val,sub,color in zip([c1,c2,c3,c4],
@@ -372,7 +372,7 @@ for col,label,val,sub,color in zip([c1,c2,c3,c4],
             <div class="stat-sub">{sub}</div>
         </div>""", unsafe_allow_html=True)
 
-# ─── ALERT ────────────────────────────────────────────────────────────────────
+#  ALERT 
 if n_fraud == 0:
     st.markdown("""<div class="alert-safe">
         <div class="alert-title">✅ All Clear — No Fraud Detected</div>
@@ -389,7 +389,7 @@ else:
         <div class="alert-desc">Please review the flagged transactions below and verify with your bank.</div>
     </div>""", unsafe_allow_html=True)
 
-# ─── CHARTS ───────────────────────────────────────────────────────────────────
+# CHARTS 
 st.markdown('<div class="section-hdr">Risk Analysis</div>', unsafe_allow_html=True)
 cl, cr = st.columns([1,2])
 
@@ -419,7 +419,7 @@ with cr:
         xaxis=dict(gridcolor='#1a2a4a'), yaxis=dict(gridcolor='#1a2a4a'))
     st.plotly_chart(fig_h, use_container_width=True)
 
-# ─── MODEL PERFORMANCE ────────────────────────────────────────────────────────
+# MODEL PERFORMANCE
 _, _, _, perf = get_model()
 st.markdown('<div class="section-hdr">Model Performance Metrics</div>', unsafe_allow_html=True)
 p1,p2,p3,p4 = st.columns(4)
@@ -433,7 +433,7 @@ for col, label, val, color in zip([p1,p2,p3,p4],
             <div class="perf-val" style="color:{color}">{val}</div>
         </div>""", unsafe_allow_html=True)
 
-# ─── FLAGGED TRANSACTIONS ─────────────────────────────────────────────────────
+#  FLAGGED TRANSACTIONS 
 if n_fraud > 0:
     st.markdown('<div class="section-hdr">🚨 Flagged Fraud Transactions</div>', unsafe_allow_html=True)
     fdf = df_res[df_res['_pred']==1].copy()
@@ -446,7 +446,7 @@ if n_fraud > 0:
     st.dataframe(fdf[dcols].reset_index(drop=True), use_container_width=True,
                  height=min(320, 55+38*n_fraud))
 
-# ─── ALL TRANSACTIONS ─────────────────────────────────────────────────────────
+# ALL TRANSACTIONS
 st.markdown('<div class="section-hdr">All Transactions</div>', unsafe_allow_html=True)
 ldf = df_res.copy()
 ldf['Risk Score'] = (ldf['_score']*100).round(1).astype(str)+'%'
@@ -457,7 +457,7 @@ if amt_col: scols.append(amt_col)
 scols += ['Risk Score','Status']
 st.dataframe(ldf[scols].reset_index(drop=True), use_container_width=True, height=360)
 
-# ─── AMOUNT SCATTER ───────────────────────────────────────────────────────────
+# AMOUNT SCATTER 
 if amt_col:
     st.markdown('<div class="section-hdr">Transaction Amounts vs Risk Score</div>', unsafe_allow_html=True)
     fig_sc = go.Figure()
@@ -476,7 +476,7 @@ if amt_col:
         legend=dict(bgcolor='rgba(0,0,0,0)'))
     st.plotly_chart(fig_sc, use_container_width=True)
 
-# ─── DOWNLOAD ─────────────────────────────────────────────────────────────────
+#  DOWNLOAD 
 st.markdown('<div class="section-hdr">Download Report</div>', unsafe_allow_html=True)
 st.download_button(
     label="⬇️ Download Fraud Detection Report (CSV)",
